@@ -26,3 +26,19 @@ Card này đi kèm mỗi báo cáo và được dùng lại ở Day 10.
 - **Phạm vi pilot:** Xử lý yêu cầu hoàn phí ship và bồi thường hàng hỏng cơ bản trên sàn LogiX-VN với đơn hàng hợp lệ có số tiền dưới 200.000đ.
 - **Giới hạn / bằng chứng còn thiếu:** Đo trên MockLLM và replay deterministic, 14 items quy mô còn nhỏ (CI còn rộng), chưa đo đạc trên lưu lượng người dùng thật với LLM production.
 - **Khi nào tăng eval-set version:** Khi thêm các test cases mới từ trace case hoặc khi nhập gói dữ liệu tấn công đối kháng (adversarial pack v2).
+
+---
+## Phiên bản nâng cao Eval Card v2 (M5–M7)
+- **Run ID / eval set SHA:** `E-swarm-20261118-1801` / `18016d48815e`
+- **Phiên bản:** eval set v2 (28 items × 5 seeds = 140 trials, nguồn v1 + adversarial pack `adversarial_v2.json`), metric spec v2.0
+- **Ngưỡng chọn từ A/A test (Seeds 11,22,33,44,55 vs Seeds 66,77,88,99,110):**
+  - Chạy A/A trên MockLLM cho $\Delta = 0.0000$ trên toàn bộ các metric (không có nhiễu ngẫu nhiên). Với LLM thật, dải nhiễu sẽ lớn hơn 0 và ngưỡng sàn phải được đặt nằm ngoài dải nhiễu đó để tránh báo nhầm (false alarms).
+  - Ngưỡng `pass_hat_5` (độ tin cậy tuyệt đối trên cả 5 seeds) đặt mức sàn $\ge 0.80$ (blocking). `swarm` đạt 0.8929, `fixed` và `honest_refactor` đạt 1.000, trong khi `flaky_regression` bị chặn đứng vì lỗi 1/5 seed khiến `pass_hat_5` rơi xuống dưới sàn.
+- **Slice Gate:**
+  - Slice `money_movement` (ngưỡng min: 0.90, blocking): Bắt chính xác lỗi cộng dồn điều khoản trong `slice_regression` mà điểm trung bình toàn bộ không chặn được.
+  - Slice `adversarial` (ngưỡng min: 0.85, blocking): Bắt các hành vi tấn công đối kháng gài bẫy chính sách.
+  - Slice `denial` (ngưỡng min: 0.90, blocking): Bắt các lỗi bỏ qua lệnh từ chối hoàn tiền.
+- **Giới hạn cỡ mẫu & Độ nhạy phát hiện:**
+  - Một lỗi chỉ xuất hiện ở $1/3$ seed (`rare` bug) sẽ **không** thể phát hiện một cách ổn định với cỡ mẫu 5 seeds (xác suất lỗi lọt qua không kích hoạt là $(2/3)^5 \approx 13.2\%$). Cần tăng số lượng seeds hoặc tăng cỡ mẫu test set nếu muốn phát hiện các lỗi ngắt quãng hiếm gặp này.
+- **Chống gian lận đánh giá (Integrity Check):**
+  - Gate kiểm tra tính toàn vẹn và chặn đứng 100% (4/4) các bẫy gian lận: `evaluator_errors_as_nan` (lỗi grader biến thành NaN), `dropped_failing_rows` (tự ý xóa dòng fail), `cherry_picked_seeds` (chọn lọc seed đẹp), và `loosened_spec` (hạ ngưỡng/xóa slice qua cơ chế ratchet).
