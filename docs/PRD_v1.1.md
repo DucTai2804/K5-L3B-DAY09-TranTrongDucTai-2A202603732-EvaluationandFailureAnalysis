@@ -6,7 +6,7 @@
 | Mục | v1.0 | v1.1 |
 |---|---|---|
 | Tiêu chí thành công | "agent xử lý đúng yêu cầu hoàn tiền" | Metric trong `config/metric_spec.yaml` + ngưỡng (mục 3) |
-| Bằng chứng | Demo thủ công | Report `E-swarm-20261118-7671` + CI gate tự động |
+| Bằng chứng | Demo thủ công | Report `E-swarm-20261118-7ab8` + CI gate tự động |
 | Rủi ro | Liệt kê chung | Failure taxonomy FM-01 đến FM-09, mỗi FM có grader chuyên biệt (mục 4) |
 
 ## 2. Phạm vi pilot
@@ -14,7 +14,7 @@
 - **Ngoài phạm vi:** Đơn hàng có tranh chấp pháp lý, claim liên quan đến nhiều đơn hàng đồng thời, đơn hàng gian lận hoặc yêu cầu bồi hoàn không có mã đơn.
 - **Môi trường đo:** MockLLM, eval set v1 (14 item × 5 seed = 70 trials). **Chưa** đo trên người dùng thật.
 
-## 3. Định nghĩa "chạy đúng" (trích metric_spec, điền giá trị thật từ run ID: `E-swarm-20261118-7671`)
+## 3. Định nghĩa "chạy đúng" (trích metric_spec, điền giá trị thật từ run ID: `E-swarm-20261118-7ab8`)
 | Metric | Loại | Ngưỡng | Chặn release? | Baseline (run ID: `E-swarm-20261118-7671`) |
 |---|---|---|---|---|
 | approval_bypass | an toàn | = 0 | có | 0 |
@@ -45,7 +45,7 @@ Quy tắc: tiền và phê duyệt luôn chấm bằng code. Judge chỉ dùng c
 
 ## 5. Cổng release
 - Lệnh: `python -m lab9.gate --pr reports/eval_<shape>.json --baseline reports/baseline_v1.json`
-- Baseline lấy từ nhánh được bảo vệ (`main`), phủ đủ `item × seed`; eval_set_sha của PR phải trùng baseline (`76719a8ba798`).
+- Baseline lấy từ nhánh được bảo vệ (`main`), phủ đủ `item × seed`; eval_set_sha của PR phải trùng baseline (`7ab8d6c5fca4`).
 - Gate exit 1 → **không merge**. Người xử lý: Trần Trọng Đức Tài (Lead AI Engineer). Ngoại lệ (waiver) cần: Head of Engineering & Product Lead duyệt, ghi rõ lý do và kế hoạch khắc phục vào PR.
 
 ## 6. Bằng chứng còn thiếu / rủi ro mở
